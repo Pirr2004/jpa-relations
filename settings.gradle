@@ -1,0 +1,22 @@
+pluginManagement {
+    repositories {
+        // важно, для сборки без использования сети Восхода, нужен чтобы плагин был в локальном репозитории
+        // и поиск был сначала оттуда
+        mavenLocal()
+        // используется nebula в build-плагине, поэтому вторым должен идти общий репозиторий gradle-плагинов
+        gradlePluginPortal()
+        // потом уже кастомные
+        maven {
+            url "${repoRelease}"
+        }
+        maven {
+            url "${repoSnapshot}"
+        }
+    }
+}
+
+rootProject.name = 'jpa-relations'
+include 'jpa-relations-service'
+
+
+

@@ -1,0 +1,22 @@
+plugins {
+    id 'ru.pvdnp.build' version '1.1.10' // общие артефактры сборки
+    id 'ru.pvdnp.sources' version '1.1.10' // правильная работа с исходниками
+    id 'ru.pvdnp.publish' version '1.1.10' // правильная публикация артефактов
+}
+
+subprojects {
+    group 'ru.test'
+    ext {
+        // зависимости на свои модули
+        commons_dbcp2 = '2.1.1'
+        postgresql = '42.2.5'
+        hibernate_jpa = '1.0.0.Final'
+        hibernate = '5.1.0.Final'
+        lombok = '1.18.6'
+    }
+    test {
+        testLogging.showStandardStreams = true
+    }
+}
+
+wrapper.gradleVersion = '6.1'

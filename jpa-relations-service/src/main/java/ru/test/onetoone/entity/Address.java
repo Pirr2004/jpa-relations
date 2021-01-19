@@ -20,8 +20,8 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne(mappedBy = "address")
-    private User user;
+    //@OneToOne(mappedBy = "address")
+    //private User user;
 
     private String street;
 

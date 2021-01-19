@@ -41,17 +41,17 @@ public class OneToOneRelationsTest {
             userDAO.save(user);
         }*/
 
-  /*      Address address = addressDAO.findById(2l).get();
+        Address address = addressDAO.findById(2l).get();
         User user = userDAO.findByAddress(address).get();
         logger.error("ID {}", user.getAddress().getStreet());
-*/
+
 
         //User user = userDAO.findById(1l).get();
         //logger.error("ID {}", user.getAddress().getStreet());
 
-       Address address = addressDAO.findById(2l).get();   //.findByStreet("Улица").get();
+       //Address address = addressDAO.findById(2l).get();   //.findByStreet("Улица").get();
 
-        logger.error("ID {}", address.getUser());
+        //logger.error("ID {}", address.getUser());
 
      //   UserBuilder.
 

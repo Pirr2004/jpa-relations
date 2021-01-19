@@ -22,7 +22,7 @@ import java.util.HashMap;
 
 @Configuration
 @ConfigurationProperties(prefix = "spring.jpa.hibernate")
-@EnableJpaRepositories("ru.test.jpa")
+@EnableJpaRepositories("ru.test.onetoone.jpa")
 public class JpaConfiguration {
 
     private HashMap<String, String> properties = new HashMap<>();
@@ -57,7 +57,7 @@ public class JpaConfiguration {
         entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter);
         entityManagerFactoryBean.setDataSource(dataSource);
         entityManagerFactoryBean.setPackagesToScan(
-                "ru.test.entity");
+                "ru.test.onetoone.entity");
         entityManagerFactoryBean.getJpaPropertyMap().putAll(properties);
         return entityManagerFactoryBean;
     }

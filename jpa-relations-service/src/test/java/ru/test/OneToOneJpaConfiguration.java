@@ -23,7 +23,7 @@ import java.util.HashMap;
 @Configuration
 @ConfigurationProperties(prefix = "spring.jpa.hibernate")
 @EnableJpaRepositories("ru.test.onetoone.jpa")
-public class JpaConfiguration {
+public class OneToOneJpaConfiguration {
 
     private HashMap<String, String> properties = new HashMap<>();
 

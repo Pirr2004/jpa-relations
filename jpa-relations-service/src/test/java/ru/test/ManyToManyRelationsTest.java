@@ -16,8 +16,10 @@ import ru.test.manytomany.entity.Student;
 import ru.test.manytomany.jpa.CourseDAO;
 import ru.test.manytomany.jpa.StudentDAO;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableConfigurationProperties(value = ManyToManyJpaConfiguration.class)
@@ -43,19 +45,47 @@ public class ManyToManyRelationsTest {
             user.setAddress(address);
             userDAO.save(user);
         }*/
-        /*Student student= Student.builder().sname("имя").courseList(new LinkedList<Course>(){{
-            add(Course.builder().cname("курс 1").build());
-            add(Course.builder().cname("курс 2").build());
-            add(Course.builder().cname("курс 3").build());
+
+        /*Course course1 = Course.builder().cname("курс 1").build();
+        Course course2 = Course.builder().cname("курс 2").build();
+        Course course3 = Course.builder().cname("курс 3").build();
+        courseDAO.saveAndFlush(course1);
+        courseDAO.saveAndFlush(course2);
+        courseDAO.saveAndFlush(course3);
+
+
+        Student student1= Student.builder().sname("имя 1").courseList(new HashSet<Course>(){{
+            add(course1);
+            add(course2);
+            add(course3);
         }}).build();
 
-        studentDAO.saveAndFlush(student); */
+        studentDAO.saveAndFlush(student1);
 
-        Student student1=studentDAO.findById(1l).get();
+        Student student2= Student.builder().sname("имя 2").courseList(new HashSet<Course>(){{
+            add(course1);
+            add(course2);
+        }}).build();
 
-        List<Course> courseList= student1.getCourseList();
+        studentDAO.saveAndFlush(student2);*/
 
-        logger.warn("size:" + courseList.size());
+
+        //Student student1=studentDAO.findById(4l).get();
+        //Set<Course> courseList= student1.getCourseList();
+        //logger.warn("{}",courseList.size());
+
+        Course course = courseDAO.findById(2l).get();
+        Set<Student> studentSet = course.getStudentList();
+        studentSet.size();
+
+        /*
+        List<Student> studentList=studentDAO.findAllByCourseIds(new LinkedList<Long>()
+            {{
+                add(course.getId());
+            }}
+        );
+
+        logger.warn("size:" + studentList.size()); */
 
 
        // Address address = addressDAO.findById(2l).get();

@@ -5,6 +5,7 @@ import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Студент
@@ -22,9 +23,11 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToMany
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
-    private List<Course> courseList;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "student_course",
+            joinColumns = { @JoinColumn(name = "fk_student") },
+            inverseJoinColumns = { @JoinColumn(name = "fk_course") })
+    private Set<Course> courseList;
 
     private String sname;
 }

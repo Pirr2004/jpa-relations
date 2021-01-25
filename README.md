@@ -811,8 +811,8 @@ select
 
 
 ##### <a name="References"></a> Ссылки 
-[Spring Data JPA - Reference Documentation](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation)
-[One-to-One Relationship in JPA](https://www.baeldung.com/jpa-one-to-one)
-[Basic Many-To-Many](https://www.baeldung.com/jpa-many-to-many)
-[When and how to use query-specific fetching](https://thorben-janssen.com/best-practices-for-many-to-many-associations-with-hibernate-and-jpa/)
-[Why you should avoid CascadeType.REMOVE for to-many associations and what to do instead](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
+* [Spring Data JPA - Reference Documentation](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation)
+* [One-to-One Relationship in JPA](https://www.baeldung.com/jpa-one-to-one)
+* [Basic Many-To-Many](https://www.baeldung.com/jpa-many-to-many)
+* [When and how to use query-specific fetching](https://thorben-janssen.com/best-practices-for-many-to-many-associations-with-hibernate-and-jpa/)
+* [Why you should avoid CascadeType.REMOVE for to-many associations and what to do instead](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)

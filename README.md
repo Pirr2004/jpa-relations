@@ -810,9 +810,92 @@ select
 ```
 
 
+# 3. OneToMany
+
+**!!! Performance Antipatterns of One To ManyAssociation in Hibernate**
+
+* Bag semantics -> List / Collection + @OneToMany -> One Element Added: 1 delete, N inserts , One Element Removed: 1 delete, N inserts
+* List semantics -> List + @OneToMany + @IndexColumn / @OrderColumn -> One Element Added: 1 insert, M updates, One Element Removed: 1 delete, M updates
+* Set semantics -> Set + @OneToMany -> One Element Added: 1 insert , One Element Removed: 1 delete
+
+## 3.1 Ссылка со стороны главной сущности
+java:
+```
+@Entity
+@Table(name ="owner")
+public class Owner {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @OneToMany( fetch = FetchType.LAZY)
+    private Set<Accaunt> account;
+    ...
+}
+
+@Entity
+@Table(name ="accaunt")
+public class Accaunt {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+ ....
+}
+
+
+```
+
+sql:  - связь через таблицу!!
+```
+create table public.accaunt (
+       id int8 not null,
+        primary key (id)
+    )
+   
+    create table public.owner (
+       id int8 not null,
+        primary key (id)
+    )
+
+    create table public.owner_accaunt (
+       Owner_id int8 not null,
+        account_id int8 not null,
+        primary key (Owner_id, account_id)
+    )
+```
+
+После добавления 
+```
+    @OneToMany( fetch = FetchType.LAZY)
+    @JoinColumn(name="owner_fk")
+    private Set<Accaunt> account;
+```
+
+sql: - связь через поле owner_fk
+```
+    create table public.accaunt (
+       id int8 not null,
+        owner_fk int8,
+        primary key (id)
+    )
+    
+    create table public.owner (
+       id int8 not null,
+        primary key (id)
+    )
+```
+
+
+
+
+
 ##### <a name="References"></a> Ссылки 
 * [Spring Data JPA - Reference Documentation](https://docs.spring.io/spring-data/jpa/docs/current/reference/html/#jpa.query-methods.query-creation)
 * [One-to-One Relationship in JPA](https://www.baeldung.com/jpa-one-to-one)
 * [Basic Many-To-Many](https://www.baeldung.com/jpa-many-to-many)
 * [When and how to use query-specific fetching](https://thorben-janssen.com/best-practices-for-many-to-many-associations-with-hibernate-and-jpa/)
 * [Why you should avoid CascadeType.REMOVE for to-many associations and what to do instead](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
+* [Performance Antipatterns of One To ManyAssociation in Hibernate](https://annals-csis.org/proceedings/2013/pliks/322.pdf)

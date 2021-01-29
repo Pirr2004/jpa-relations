@@ -11,29 +11,22 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
-import ru.test.manytomany.entity.Course;
-import ru.test.manytomany.entity.Student;
-import ru.test.manytomany.jpa.CourseDAO;
-import ru.test.manytomany.jpa.StudentDAO;
-
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import ru.test.onetomany.jpa.AccauntDAO;
+import ru.test.onetomany.jpa.OwnerDAO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@EnableConfigurationProperties(value = ManyToManyJpaConfiguration.class)
+@EnableConfigurationProperties(value = OneToManyJpaConfiguration.class)
 @TestPropertySource("classpath:application.properties")
 @ContextConfiguration(classes = {DatabaseTestConfiguration.class})
-public class ManyToManyRelationsTest {
+public class OneToManyRelationsTest {
 
     @Autowired
-    private StudentDAO studentDAO;
+    private OwnerDAO ownerDAO;
 
     @Autowired
-    private CourseDAO courseDAO;
+    private AccauntDAO accauntDAO;
 
-    private Logger logger = LoggerFactory.getLogger(ManyToManyRelationsTest.class);
+    private Logger logger = LoggerFactory.getLogger(OneToManyRelationsTest.class);
 
     @Test
     @Transactional

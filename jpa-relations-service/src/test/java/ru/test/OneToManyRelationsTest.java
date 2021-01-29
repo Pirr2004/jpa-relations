@@ -11,8 +11,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
+import ru.test.onetomany.entity.Accaunt;
+import ru.test.onetomany.entity.Owner;
 import ru.test.onetomany.jpa.AccauntDAO;
 import ru.test.onetomany.jpa.OwnerDAO;
+
+import java.util.HashSet;
+import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @EnableConfigurationProperties(value = OneToManyJpaConfiguration.class)
@@ -32,6 +37,34 @@ public class OneToManyRelationsTest {
     @Transactional
     @Rollback(false)
     public void test() {
+        /*for (int i=0;i<300;i++){
+            Owner owner = Owner.builder().name("name " + i).build();
+
+            ownerDAO.save(owner);
+            for (int j=0;j<3;j++) {
+                Accaunt accaunt = Accaunt.builder().build();
+                accaunt.setOwner(owner);
+                accauntDAO.save(accaunt);
+            }
+
+        }*/
+
+
+
+       /*Accaunt accaunt = accauntDAO.findById(2l).get();
+       Owner owner =accaunt.getOwner();
+
+       owner.getName();
+*/
+        Owner owner = ownerDAO.findById(1l).get();
+        List<Accaunt> accauntList = accauntDAO.findAllByOwner(owner);
+        accauntList.size();
+
+
+
+
+
+
         /*for (int i=0; i<500;i++) {
             User user = User.builder().name("Что имя тебе мое").build();
             Address address = Address.builder().houseNumber("111a").street("Улица").build();

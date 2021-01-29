@@ -22,7 +22,6 @@ public class Owner {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToMany( fetch = FetchType.LAZY)
-    @JoinColumn(name="owner_fk")
-    private Set<Accaunt> account;
+    @Column
+    private String name;
 }

@@ -810,7 +810,7 @@ select
 ```
 
 
-# 3. OneToMany
+# 3. OneToMany/ManyToOne
 
 **!!! Performance Antipatterns of One To ManyAssociation in Hibernate**
 
@@ -818,7 +818,7 @@ select
 * List semantics -> List + @OneToMany + @IndexColumn / @OrderColumn -> One Element Added: 1 insert, M updates, One Element Removed: 1 delete, M updates
 * Set semantics -> Set + @OneToMany -> One Element Added: 1 insert , One Element Removed: 1 delete
 
-## 3.1 Ссылка со стороны главной сущности
+## 3.1 Ссылка только со стороны главной сущности
 java:
 ```
 @Entity
@@ -830,7 +830,7 @@ public class Owner {
     private Long id;
 
     @OneToMany( fetch = FetchType.LAZY)
-    private Set<Accaunt> account;
+    private Set<Accaunt> accounts;
     ...
 }
 
@@ -887,6 +887,389 @@ sql: - связь через поле owner_fk
         primary key (id)
     )
 ```
+
+Далее работаем через joinColumn:
+
+### 3.1.1 Обращение через главную сущность
+```
+Owner owner = ownerDAO.findById(...).get();
+owner.getAccount().size();
+```
+и в случае и в случае с EAGER/LAZY:
+sql:
+```
+    select
+        owner0_.id as id1_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+
+    select
+        account0_.owner_fk as owner_fk2_0_0_,
+        account0_.id as id1_0_0_,
+        account0_.id as id1_0_1_  // --?????????????
+    from
+        public.accaunt account0_ 
+    where
+        account0_.owner_fk=?
+
+
+```
+
+### 3.1.1 Обращение через зависимую сущность
+
+```
+    @Query("select o from Owner o join o.accounts a where a=:accaunt")
+    Optional<Owner> findByAccaunt(@Param("accaunt") Accaunt accaunt);
+
+    .......
+
+    Accaunt accaunt = accauntDAO.findById(1l).get();
+    Owner owner = ownerDAO.findByAccaunt(accaunt).get();
+
+```
+
+sql LAZY:
+
+```
+select
+        accaunt0_.id as id1_0_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.id=?
+ 
+    select
+        owner0_.id as id1_1_ 
+    from
+        public.owner owner0_ 
+    inner join
+        public.accaunt accounts1_ 
+            on owner0_.id=accounts1_.owner_fk 
+    where
+        accounts1_.id=?
+```
+
+sql EAGER:
+
+**Опять три запроса!!!**
+
+```
+    select
+        accaunt0_.id as id1_0_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.id=?
+
+    select
+        owner0_.id as id1_1_ 
+    from
+        public.owner owner0_ 
+    inner join
+        public.accaunt accounts1_ 
+            on owner0_.id=accounts1_.owner_fk 
+    where
+        accounts1_.id=?
+
+    select
+        accounts0_.owner_fk as owner_fk2_0_0_,
+        accounts0_.id as id1_0_0_,
+        accounts0_.id as id1_0_1_ 
+    from
+        public.accaunt accounts0_ 
+    where
+        accounts0_.owner_fk=?
+
+```
+
+## 3.2 Ссылка со стороны главной сущности и со стороны зависимой с mappedBy
+java:
+```
+@Entity
+@Table(name ="owner")
+public class Owner {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @OneToMany( fetch = FetchType.LAZY,mappedBy = "owner")
+    private Set<Accaunt> accounts;
+}
+
+
+@Entity
+@Table(name ="accaunt")
+public class Accaunt {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToOne( fetch = FetchType.LAZY)
+    @JoinColumn(name="owner_fk")
+    private Owner owner;
+    
+    ..................
+}
+
+```
+
+sql:
+```
+    create table public.accaunt (
+       id int8 not null,
+        owner_fk int8,
+        primary key (id)
+    )
+    
+    create table public.owner (
+       id int8 not null,
+        primary key (id)
+    )
+
+```
+### 3.2.1 Обращение через главную сущность
+```
+Owner owner = ownerDAO.findById(...).get();
+owner.getAccount().size();
+```
+LAZY:
+```
+    select
+        accaunt0_.id as id1_0_0_,
+        accaunt0_.owner_fk as owner_fk2_0_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.id=?
+
+    select
+        owner0_.id as id1_1_ 
+    from
+        public.owner owner0_ 
+    inner join
+        public.accaunt accounts1_ 
+            on owner0_.id=accounts1_.owner_fk 
+    where
+        accounts1_.id=?
+
+```
+
+EAGER:
+```
+    select
+        accaunt0_.id as id1_0_0_,
+        accaunt0_.owner_fk as owner_fk2_0_0_,
+        owner1_.id as id1_1_1_ 
+    from
+        public.accaunt accaunt0_ 
+    left outer join
+        public.owner owner1_ 
+            on accaunt0_.owner_fk=owner1_.id 
+    where
+        accaunt0_.id=?
+
+    select
+        accounts0_.owner_fk as owner_fk2_0_0_,
+        accounts0_.id as id1_0_0_,
+        accounts0_.id as id1_0_1_,
+        accounts0_.owner_fk as owner_fk2_0_1_ 
+    from
+        public.accaunt accounts0_ 
+    where
+        accounts0_.owner_fk=?
+
+```
+
+
+### 3.2.2 Обращение через зависимую сущность
+```
+    Accaunt accaunt = accauntDAO.findById(2l).get();
+       Owner owner =accaunt.getOwner();
+       owner.getName();  // Необходимо обращение к полю таблицы. Иначе LAZY вообще обойдется одним запросом 
+```
+
+sql LAZY
+```
+ select
+        accaunt0_.id as id1_0_0_,
+        accaunt0_.owner_fk as owner_fk2_0_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.id=?
+
+    select
+        owner0_.id as id1_1_0_,
+        owner0_.name as name2_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+
+```
+sql EAGER:
+```
+select
+        accaunt0_.id as id1_0_0_,
+        accaunt0_.owner_fk as owner_fk2_0_0_,
+        owner1_.id as id1_1_1_,
+        owner1_.name as name2_1_1_ 
+    from
+        public.accaunt accaunt0_ 
+    left outer join
+        public.owner owner1_ 
+            on accaunt0_.owner_fk=owner1_.id 
+    where
+        accaunt0_.id=?
+
+    select
+        accounts0_.owner_fk as owner_fk2_0_0_,
+        accounts0_.id as id1_0_0_,
+        accounts0_.id as id1_0_1_,
+        accounts0_.owner_fk as owner_fk2_0_1_ 
+    from
+        public.accaunt accounts0_ 
+    where
+        accounts0_.owner_fk=?
+```
+**Странные запросы!!**
+
+## 3.3 ManyToOne без обратной связи
+
+java:
+```
+@Entity
+@Table(name ="owner")
+public class Owner {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    ....
+}
+
+@Entity
+@Table(name ="accaunt")
+public class Accaunt {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToOne
+    private Owner owner;
+
+}
+
+```
+
+sql:
+```
+    create table public.accaunt (
+       id int8 not null,
+        owner_id int8,
+        primary key (id)
+    )
+
+    
+    create table public.owner (
+       id int8 not null,
+        name varchar(255),
+        primary key (id)
+    )
+```
+### 3.3.1 Обращение через главную сущность
+```
+        Accaunt accaunt = accauntDAO.findById(2l).get();
+       Owner owner =accaunt.getOwner();
+       owner.getName();
+```
+LAZY:
+```
+select
+        accaunt0_.id as id1_0_0_,
+        accaunt0_.owner_id as owner_id2_0_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.id=?
+
+    select
+        owner0_.id as id1_1_0_,
+        owner0_.name as name2_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+```
+
+
+EAGER:
+```
+select
+        accaunt0_.id as id1_0_0_,
+        accaunt0_.owner_id as owner_id2_0_0_,
+        owner1_.id as id1_1_1_,
+        owner1_.name as name2_1_1_ 
+    from
+        public.accaunt accaunt0_ 
+    left outer join
+        public.owner owner1_ 
+            on accaunt0_.owner_id=owner1_.id 
+    where
+        accaunt0_.id=?
+```
+
+### 3.3.1 Обращение через зависимую сущность
+```
+    Owner owner = ownerDAO.findById(..).get();
+    List<Accaunt> accauntList = accauntDAO.findAllByOwner(owner);
+    accauntList.size();
+```
+
+LAZY:
+```
+select
+        owner0_.id as id1_1_0_,
+        owner0_.name as name2_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+ 
+    select
+        accaunt0_.id as id1_0_,
+        accaunt0_.owner_id as owner_id2_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.owner_id=?
+```
+
+EAGER:
+```
+select
+        owner0_.id as id1_1_0_,
+        owner0_.name as name2_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+
+    select
+        accaunt0_.id as id1_0_,
+        accaunt0_.owner_id as owner_id2_0_ 
+    from
+        public.accaunt accaunt0_ 
+    where
+        accaunt0_.owner_id=?
+```
+
 
 
 

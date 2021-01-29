@@ -1139,7 +1139,7 @@ select
 **Странные запросы!!**
 
 ## 3.3 ManyToOne без обратной связи
-
+прим. @ManyToOne не имеет поля mappedBy
 java:
 ```
 @Entity

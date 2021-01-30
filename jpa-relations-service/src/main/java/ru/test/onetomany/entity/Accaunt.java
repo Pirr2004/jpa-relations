@@ -20,7 +20,4 @@ public class Accaunt {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    private Owner owner;
-
 }

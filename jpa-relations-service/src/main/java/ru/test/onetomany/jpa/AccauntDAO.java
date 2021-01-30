@@ -14,6 +14,6 @@ import java.util.List;
  */
 public interface AccauntDAO extends JpaRepository<Accaunt, Long> {
 
-    List<Accaunt> findAllByOwner(Owner owner);
+   // List<Accaunt> findAllByOwner(Owner owner);
 
 }

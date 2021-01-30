@@ -17,6 +17,7 @@ import ru.test.onetomany.jpa.AccauntDAO;
 import ru.test.onetomany.jpa.OwnerDAO;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -38,16 +39,26 @@ public class OneToManyRelationsTest {
     @Rollback(false)
     public void test() {
         /*for (int i=0;i<300;i++){
-            Owner owner = Owner.builder().name("name " + i).build();
+            Owner owner = Owner.builder().name("name " + i).accaunts(new HashSet<>()).build();
 
             ownerDAO.save(owner);
             for (int j=0;j<3;j++) {
                 Accaunt accaunt = Accaunt.builder().build();
-                accaunt.setOwner(owner);
                 accauntDAO.save(accaunt);
+                owner.getAccaunts().add(accaunt);
             }
 
-        }*/
+        } */
+
+  /*      Owner owner = ownerDAO.findById(1L).get();
+        Accaunt accaunt = accauntDAO.findById(2L).get();
+        owner.getAccaunts().remove(accaunt);
+*/
+        Owner owner = ownerDAO.findById(1L).get();
+        Accaunt accaunt = Accaunt.builder().build();
+        accauntDAO.save(accaunt);
+        owner.getAccaunts().add(accaunt);
+
 
 
 
@@ -56,9 +67,9 @@ public class OneToManyRelationsTest {
 
        owner.getName();
 */
-        Owner owner = ownerDAO.findById(1l).get();
-        List<Accaunt> accauntList = accauntDAO.findAllByOwner(owner);
-        accauntList.size();
+       // Owner owner = ownerDAO.findById(1l).get();
+       // List<Accaunt> accauntList = accauntDAO.findAllByOwner(owner);
+       // accauntList.size();
 
 
 

@@ -1272,6 +1272,222 @@ select
 
 
 
+* Bag semantics -> List / Collection + @OneToMany -> One Element Added: 1 delete, N inserts , One Element Removed: 1 delete, N inserts
+* List semantics -> List + @OneToMany + @IndexColumn / @OrderColumn -> One Element Added: 1 insert, M updates, One Element Removed: 1 delete, M updates
+* Set semantics -> Set + @OneToMany -> One Element Added: 1 insert , One Element Removed: 1 delete
+
+
+Проверка 1: 
+
+* Bag semantics -> List / Collection + @OneToMany -> One Element Added: 1 delete, N inserts , One Element Removed: 1 delete, N inserts
+
+## Случай 1
+java:
+```
+@Entity
+@Table(name ="accaunt")
+public class Accaunt {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Owner owner;
+
+}
+
+@Entity
+@Table(name ="owner")
+public class Owner {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @OneToMany(mappedBy = "owner")
+    private List<Accaunt> accaunts;
+
+    @Column
+    private String name;
+}
+```
+
+
+```
+
+        Owner owner = ownerDAO.findById(1L).get();
+        Accaunt accaunt = Accaunt.builder().build();
+        
+        // owner.getAccaunts().add(accaunt)  не работает потому что MAPPED BY!!!
+        accaunt.setOwner(owner);  
+        accauntDAO.save(accaunt);
+
+```
+
+ sql - никаких N inserts!!:
+```
+    select
+        owner0_.id as id1_1_0_,
+        owner0_.name as name2_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+    select
+        nextval ('public.hibernate_sequence')
+
+    insert 
+    into
+        public.accaunt
+        (owner_id, id) 
+    values
+        (?, ?)
+```
+
+## Случай 2
+
+java:
+```
+@Entity
+@Table(name ="owner")
+public class Owner {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+    @OneToMany
+    private List<Accaunt> accaunts;
+
+    ....
+}
+
+@Entity
+@Table(name ="accaunt")
+public class Accaunt {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
+
+   ...
+}
+```
+
+ddl:
+```
+create table public.accaunt (
+       id int8 not null,
+        primary key (id)
+    )
+
+    
+    create table public.owner (
+       id int8 not null,
+        name varchar(255),
+        primary key (id)
+    )
+    
+    create table public.owner_accaunt (
+       Owner_id int8 not null,
+        accaunts_id int8 not null
+    )
+```
+
+Код:
+```
+        Owner owner = ownerDAO.findById(1L).get();
+        Accaunt accaunt = Accaunt.builder().build();
+        accauntDAO.save(accaunt);
+        owner.getAccaunts().add(accaunt);
+```
+
+sql:
+```
+select
+        owner0_.id as id1_1_0_,
+        owner0_.name as name2_1_0_ 
+    from
+        public.owner owner0_ 
+    where
+        owner0_.id=?
+
+
+    select
+        nextval ('public.hibernate_sequence')
+
+    select
+        accaunts0_.Owner_id as Owner_id1_2_0_,
+        accaunts0_.accaunts_id as accaunts2_2_0_,
+        accaunt1_.id as id1_0_1_ 
+    from
+        public.owner_accaunt accaunts0_ 
+    inner join
+        public.accaunt accaunt1_ 
+            on accaunts0_.accaunts_id=accaunt1_.id 
+    where
+        accaunts0_.Owner_id=?
+
+    insert 
+    into
+        public.accaunt
+        (id) 
+    values
+        (?)
+
+
+
+    delete 
+    from
+        public.owner_accaunt 
+    where
+        Owner_id=?
+
+    insert 
+    into
+        public.owner_accaunt
+        (Owner_id, accaunts_id) 
+    values
+        (?, ?)
+
+    insert 
+    into
+        public.owner_accaunt
+        (Owner_id, accaunts_id) 
+    values
+        (?, ?)
+
+    insert 
+    into
+        public.owner_accaunt
+        (Owner_id, accaunts_id) 
+    values
+        (?, ?)
+
+    insert 
+    into
+        public.owner_accaunt
+        (Owner_id, accaunts_id) 
+    values
+        (?, ?)
+
+```
+
+**Вывод** Вот оно !!!  One Element Added: 1 delete, N inserts при работе через таблицу
+Аналогично с удалением
+
+При работе через joincolumn эффекта не наблюдается!!
+
+
+
+**Выводы**
+Работать через lazy
+Использовать по возможности join column
+При использовании join table всегда использовать Set<> (или просто всегда использовать Set)
+Не забывать выставлять индексы на fk-поля
+
+
 
 
 

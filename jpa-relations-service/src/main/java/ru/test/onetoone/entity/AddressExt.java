@@ -13,15 +13,12 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name ="user2")
-public class User2 {
+@Table(name ="addressext")
+public class AddressExt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
-
-    @OneToOne(cascade = CascadeType.ALL)
-    private Address address;
 
     String name;
 }

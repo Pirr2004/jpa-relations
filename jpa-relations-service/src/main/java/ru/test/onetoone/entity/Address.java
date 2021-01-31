@@ -20,11 +20,8 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @OneToOne(mappedBy = "address", fetch = FetchType.LAZY)
+    @OneToOne
     private User user;
-
-    /*@OneToOne(fetch = FetchType.LAZY)
-    private User2 user2;*/
 
     private String street;
 

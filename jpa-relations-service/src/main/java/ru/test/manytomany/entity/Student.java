@@ -23,7 +23,7 @@ public class Student {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "student_course",
             joinColumns = { @JoinColumn(name = "fk_student") },
             inverseJoinColumns = { @JoinColumn(name = "fk_course") })

@@ -348,7 +348,7 @@ address.getUser()
 ## 2.1 Ссылка только с одной сущности
 
 Java-код:
-```
+```java
 @Entity
 @Table(name ="student")
 public class Student {
@@ -1498,3 +1498,42 @@ select
 * [When and how to use query-specific fetching](https://thorben-janssen.com/best-practices-for-many-to-many-associations-with-hibernate-and-jpa/)
 * [Why you should avoid CascadeType.REMOVE for to-many associations and what to do instead](https://thorben-janssen.com/avoid-cascadetype-delete-many-assocations/)
 * [Performance Antipatterns of One To ManyAssociation in Hibernate](https://annals-csis.org/proceedings/2013/pliks/322.pdf)
+
+```
+select
+        user0_.id as id1_2_0_,
+        user0_.address_id as address_3_2_0_,
+        user0_.name as name2_2_0_,
+        address1_.id as id1_0_1_,
+        address1_.addressExt_id as addressE4_0_1_,
+        address1_.houseNumber as houseNum2_0_1_,
+        address1_.street as street3_0_1_,
+        addressext2_.id as id1_1_2_,
+        addressext2_.name as name2_1_2_ 
+    from
+        public.user user0_ 
+    left outer join
+        public.address address1_ 
+            on user0_.address_id=address1_.id 
+    left outer join
+        public.addressext addressext2_ 
+            on address1_.addressExt_id=addressext2_.id 
+    where
+        user0_.id=?
+```
+
+```
+    create table address (
+       id int8 not null,
+        houseNumber varchar(255),
+        street varchar(255),
+        user_id int8,
+        primary key (id)
+    )
+
+    create table user (
+       id int8 not null,
+        name varchar(255),
+        primary key (id)
+    )
+```

@@ -45,10 +45,10 @@ public class ManyToManyRelationsTest {
             user.setAddress(address);
             userDAO.save(user);
         }*/
-
-        /*Course course1 = Course.builder().cname("курс 1").build();
-        Course course2 = Course.builder().cname("курс 2").build();
-        Course course3 = Course.builder().cname("курс 3").build();
+/*
+        Course course1 = Course.builder().cname("курс 1").studentList(new HashSet<>()).build();
+        Course course2 = Course.builder().cname("курс 2").studentList(new HashSet<>()).build();
+        Course course3 = Course.builder().cname("курс 3").studentList(new HashSet<>()).build();
         courseDAO.saveAndFlush(course1);
         courseDAO.saveAndFlush(course2);
         courseDAO.saveAndFlush(course3);
@@ -67,7 +67,16 @@ public class ManyToManyRelationsTest {
             add(course2);
         }}).build();
 
-        studentDAO.saveAndFlush(student2);*/
+        studentDAO.saveAndFlush(student2);
+
+        course1.getStudentList().add(student1);
+
+*/
+        Student student=studentDAO.findById(4l).get();
+        Set<Course> courseList= student.getCourseList();
+        Course course = Course.builder().cname("курс 6").build();
+        courseDAO.save(course);
+        courseList.add(course);
 
 
         //Student student1=studentDAO.findById(4l).get();

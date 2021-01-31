@@ -12,8 +12,10 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.transaction.annotation.Transactional;
 import ru.test.onetoone.entity.Address;
+import ru.test.onetoone.entity.AddressExt;
 import ru.test.onetoone.entity.User;
 import ru.test.onetoone.jpa.AddressDAO;
+import ru.test.onetoone.jpa.AddressExtDAO;
 import ru.test.onetoone.jpa.UserDAO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -27,6 +29,8 @@ public class OneToOneRelationsTest {
 
     @Autowired
     private UserDAO userDAO;
+    @Autowired
+    private AddressExtDAO addressExtDAO;
 
     private Logger logger = LoggerFactory.getLogger(OneToOneRelationsTest.class);
 
@@ -34,23 +38,26 @@ public class OneToOneRelationsTest {
     @Transactional
     @Rollback(false)
     public void test() {
-        /*for (int i=0; i<1000;i++) {
+        /* for (int i=0; i<1000;i++) {
             User user = User.builder().name("Что имя тебе мое").build();
-            Address address = Address.builder().houseNumber("111a").street("Улица").build();
+            AddressExt ext = AddressExt.builder().build();
+            addressExtDAO.save(ext);
+            Address address = Address.builder().houseNumber("111a").street("Улица").addressExt(ext).build();
+            addressDAO.save(address);
             user.setAddress(address);
             userDAO.save(user);
         } */
 
         //User user = userDAO.findById(1l).get();
-        Address address = addressDAO.findById(2l).get();
-        address.getUser().getName();
+       // Address address = addressDAO.findById(2l).get();
+       // address.getUser().getName();
         //User user = userDAO.findByAddress(address).get();
         //logger.error("ID {}", user.getAddress().getStreet());
         //logger.error("ID {}", address.getUser().getName());
 
 
-        //User user = userDAO.findById(1l).get();
-        //logger.error("ID {}", user.getAddress().getStreet());
+       // User user = userDAO.findById(3l).get();
+       // logger.error("ID {}", user.getAddress().getStreet());
 
        //Address address = addressDAO.findById(2l).get();   //.findByStreet("Улица").get();
 
